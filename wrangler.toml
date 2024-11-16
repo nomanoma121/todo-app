@@ -1,0 +1,14 @@
+# wrangler.toml
+
+name = "todo-app"  
+type = "typescript"    
+
+[env.production]
+name = "todo-app"  # 本番環境用の名前
+
+[[env.production.kv_namespaces]]
+binding = "DATABASE"  
+id = "7ba4f6be-b622-4d33-b432-80143706839b"  
+
+[build]
+command = "npm run build"  # Remix プロジェクトのビルドコマンド
