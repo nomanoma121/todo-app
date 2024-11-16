@@ -1,0 +1,15 @@
+name = "todo-app"
+main = "app/workers.ts"
+
+[[env]]
+name = "production"
+
+[[env.d1_databases]]
+binding = "DB"
+database_name = "database"
+database_id = "16400944-acb3-4c7b-b73d-9c4675b55676"
+
+[[env]]
+name = "database"
+binding = "DB"
+database = "16400944-acb3-4c7b-b73d-9c4675b55676" 
