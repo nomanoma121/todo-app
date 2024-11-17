@@ -1,17 +1,24 @@
-import { Hono } from 'hono';
-import { Env } from './env';  // Envインターフェース
+import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get('/', async (c) => {
-  const items = await c.env.DB.prepare('SELECT * FROM items').all();
-  return c.json(items);
+app.get("/api/get", async (c: any) => {
+  try {
+    const result = await c.env.DB.prepare("SELECT * FROM users").all();
+    return c.json(result);
+  } catch (err) {
+    return c.json({ error: "データ取得エラー" });
+  }
 });
 
-app.post('/add-item', async (c) => {
-  const { name } = await c.req.json();
-  const result = await c.env.DB.prepare('INSERT INTO items(name) VALUES (?) RETURNING *').bind(name).first();
-  return c.json(result);
+app.post("/api/post", async (c: any) => {
+  const param = await c.req.json();
+  try {
+    await c.env.DB.prepare(`INSERT INTO users (name) VALUES (?)`).bind(param.name).run();
+    return c.json({ message: "Successfully created." });
+  } catch (err) {
+    return c.json({ error: "データ挿入エラー" });
+  }
 });
 
 export default app;
