@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Form } from "@remix-run/react";
+import { Form, Outlet } from "@remix-run/react";
 
 type Todo = {
   id: number;
@@ -30,6 +30,9 @@ function Index() {
             <li></li>
           ))} 
         </ul>
+      </div>
+      <div>
+        <Outlet />
       </div>
     </div>
   );
