@@ -9,7 +9,7 @@ export const loader = async () => {
 };
 
 // コンポーネントで useLoaderData を使用
-export default function ItemsList() {
+export default function Tasks() {
   const items: any = useLoaderData();
   
   // useLoaderData で取得したデータをコンソールに表示

@@ -21,4 +21,23 @@ app.post("/api/post", async (c: any) => {
   }
 });
 
+app.post("/api/register", async (c: any) => {
+  const username = await c.req.json();
+  console.log(username);
+
+  c.env.DB.prepare('INSERT INTO users (name) VALUES (?)').bind(username).run();
+  return c.text('User registered successfully');
+});
+
+app.post("/api/search", async (c: any) => {
+  console.log("searching...");
+  const username = await c.req.json();
+
+  const result = await c.env.DB.prepare(`SELECT * FROM users WHERE name = ?`).bind(username).all();
+  if (result.results.length > 0) {
+    return c.json(result.results[0]);
+  }
+  return c.text("User not found", 404);
+});
+
 export default app;
