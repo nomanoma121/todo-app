@@ -1,4 +1,5 @@
 import { Links, Meta, Scripts, Outlet } from "@remix-run/react";
+import Header from "./Header";
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Header />
         <main>
           <Outlet />
         </main>
