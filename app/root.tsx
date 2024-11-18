@@ -21,20 +21,13 @@ export const action = async ({ request }: ActionFunctionArgs ) => {
     if (response.ok) {
       console.log("ユーザー登録に成功しました。");
     }
-  }
+  } else 
 
   if (actionType == "search") {
-    const response = await fetch("http://localhost:8787/api/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(searchname),
-    });
+    const response = await fetch(`http://localhost:8787/api/search?name=${searchname}`);
     const data = await response.json();
 
     if(response.ok){
-      console.log(data);
       return redirect(`/${data.name}`);
     }
   }
