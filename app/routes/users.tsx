@@ -2,7 +2,7 @@ import { json, useLoaderData } from "@remix-run/react";
 
 // `loader` 関数でデータを取得する
 export const loader = async () => {
-  const response = await fetch("http://localhost:8787/api/get");
+  const response = await fetch("http://localhost:8787/api/get?table='users'");
   const data = await response.json();
   console.log("loader function running!!");
   return json({data});

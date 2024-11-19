@@ -1,7 +1,7 @@
-import { ActionFunctionArgs } from '@remix-run/node';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, json, useLoaderData } from '@remix-run/react';
 
-export const loader = async ({ request }) => {
+export const loader = async ({ request }:LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const username = url.pathname.replace(/^\/+/, '');
   const response = await fetch(`http://localhost:8787/api/tasks?name=${username}`);
@@ -27,7 +27,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return null;
 }
 
-
 function Todos() {
   const tasks = useLoaderData<typeof loader>();
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
@@ -43,7 +42,7 @@ function Todos() {
         <input type="submit" value="追加" />
       </Form>
       <ul>
-        {(tasks.data.id !== 0) && tasks.data.map((e) => (
+        {(tasks.data.id !== 0) && tasks.data.map((e:any) => (
           <li key={e.id}>{e.task}</li>
         ))}
       </ul>
