@@ -1,6 +1,9 @@
 import { Hono } from "hono";
+import { s } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 const app = new Hono();
+
+
 
 app.get("/api/get", async (c: any) => {
   try {
@@ -47,44 +50,35 @@ app.get("/api/search", async (c: any) => {
 
 //usernameからuseridを取得し、taskを取得する
 app.get("/api/tasks", async (c: any) => {
-  const username: string = c.req.query("name");
+  const username: string = await c.req.query("name");
 
-  const userid: number = await c.env.DB.prepare(
-    "SELECT id FROM users WHERE name = ?"
-  )
-    .bind(username)
-    .catch(() => {
-      return c.json({ message: "User not found. " }, 404);
-    });
-
-  type tasksResult = {
-    id: number;
-    userid: number;
-    task: string;
-    completed: boolean;
-  };
-
-  const result: tasksResult[] | [] = await c.env.DB.prepare(
-    "SELECT * FROM tasks WHERE userid = ?"
-  )
-    .bind(userid)
-    .all()
-    .catch(() => {
-      return c.json({ message: "Internal server error." }, 500);
-    });
-
-    return c.json(result);
+  try {
+    // ユーザーidを取得
+    const userResult = await c.env.DB.prepare("SELECT id FROM users WHERE name = ?").bind(username).first();
+    const userid = userResult.id;
+    // ユーザーidをもとにタスクを取得
+    const result = await c.env.DB.prepare("SELECT * FROM tasks WHERE userid = ?").bind(userid).all();
+    console.log(result);
+    return c.json(result.results);
+  } catch {
+    console.log("Internal Server Error.");
+    return c.json({ message: "Internal Server Error."}, 500);
+  }
 });
 
 //タスクを追加
 app.post("/api/add", async (c: any) => {
-  const param = c.req.json();
-
-  c.env.DB.prepare(
-    "INSERT INTO tasks (userid, tasks, completed) VALUE (?, ?, ?)"
-  ).bind(param.userid, param.tasks, param.completed);
+  const param = await c.req.json();
+  try {
+  await c.env.DB.prepare(
+    "INSERT INTO tasks (userid, task, completed) VALUES (?, ?, ?)"
+  ).bind(param.userid, param.tasks, param.completed).run();
 
   return c.json({ message: "Successfully added" });
+ } catch (error) {
+   console.error("Internal Server Error.", error);
+   return c.json({ message: "Internal Server Error."});
+ }
 });
 
 export default app;
