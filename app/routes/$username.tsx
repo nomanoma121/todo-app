@@ -1,5 +1,10 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, json, useLoaderData } from '@remix-run/react';
+import styles from "../styles/username.css";
+
+export function links() {
+  return [{ rel: 'stylesheet', href: styles }];
+}
 
 export const loader = async ({ request }:LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -32,22 +37,28 @@ function Todos() {
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
   console.log(tasks.data);
   return (
-    <div>
-      <Form method="POST">
+    <div className="todos-container">
+      <Form method="POST" className="add-task-form">
         <input type="hidden" name="userid" value={userid} />
-        <label>
-          タスクを追加
-          <input type="text" name="task" />
+        <label className="task-label">
+          タスクを追加:
+          <input type="text" name="task" className="task-input" placeholder="新しいタスクを入力" />
         </label>
-        <input type="submit" value="追加" />
+        <button type="submit" className="add-button">追加</button>
       </Form>
-      <ul>
-        {(tasks.data.id !== 0) && tasks.data.map((e:any) => (
-          <li key={e.id}>{e.task}</li>
-        ))}
+      <ul className="task-list">
+        {(tasks.data.id !== 0) &&
+          tasks.data.map((e: any) => (
+            <li key={e.id} className="task-item">
+              <span className="task-text">{e.task}</span>
+              <button className="edit-button">編集</button>
+              <button className="delete-button">削除</button>
+            </li>
+          ))}
       </ul>
     </div>
-  )
+  );
 }
 
-export default Todos 
+export default Todos;
+

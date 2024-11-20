@@ -1,6 +1,10 @@
 import { Hono } from "hono";
+import { s } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 const app = new Hono();
+
+//TODO:エラーハンドリングを全くやっていないのでやる
+
 
 app.get("/api/get", async (c: any) => {
   const table = await c.req.query("table");
@@ -80,6 +84,35 @@ app.post("/api/add", async (c: any) => {
   } catch (error) {
     return c.json({ message: "Internal Server Error."});
  }
+});
+
+app.put("/api/edit/:id", async(c: any) => {
+  const id = c.req.param("id");
+
+  const param = await c.req.json();
+  console.log(param);
+  
+  try {
+    await c.env.DB.prepare(
+      "UPDATE tasks SET task = ?, completed = ? WHERE id = ?" 
+    ).bind(param.task, param.completed, id).run();
+
+    return c.json({ message: "Successfully edited" });
+  } catch (err) {
+    console.log(err);
+    return c.json({ message: "Internal Server Error." });
+  }
+});
+
+app.delete("/api/delete/:id", async(c:any) => {
+  const id = c.req.param("id");
+  
+  try {
+    await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(id).run();
+    return c.json({ message: "Successfully deleted" });
+  } catch (err) {
+    return c.json({ message: "Internal Server Error" });
+  }
 });
 
 export default app;
