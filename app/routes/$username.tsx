@@ -97,7 +97,7 @@ function Todos() {
                 <input type="hidden" name="id" value={e.id} />
                 <input type="checkbox" name="checkbox" value={e.completed} />
                 {/* valueの中身を一時的に消している */}
-                <input type="input" name="task" className="task-text" value={e.task}/>
+                <input type="textarea" name="task" className="task-text" value={e.task} readOnly />
                 <button type="submit" className="edit-button">編集</button>
               </Form>
               <Form method="POST">
