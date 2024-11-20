@@ -55,11 +55,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       console.log("タスクの編集に成功しました。");
     }
   } else if (method === "DELETE") {
-    console.log("DELETEのif文までは来ている");
     const taskId = formData.get("id");
-    const response = await fetch(`http://localhost:8787/api/delete/${taskId}`,{
-      method: "DELETE"
-    });
+    const response = await fetch(`http://localhost:8787/api/delete/${taskId}`,{ method: "DELETE" });
   }
 
 

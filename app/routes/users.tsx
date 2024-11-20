@@ -12,9 +12,6 @@ export const loader = async () => {
 export default function Tasks() {
   const items: any = useLoaderData();
   
-  // useLoaderData で取得したデータをコンソールに表示
-  console.log("Loaded Items in Component:", items.data.results);
-
   const itemsArray = items.data.results;
 
   return (
