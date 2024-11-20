@@ -20,6 +20,7 @@ export const action = async ({ request }: ActionFunctionArgs ) => {
 
     if (response.ok) {
       console.log("ユーザー登録に成功しました。");
+      return redirect(`/${registername}`);
     }
   } else 
 

@@ -86,6 +86,7 @@ app.post("/api/add", async (c: any) => {
  }
 });
 
+//タスク内容とcompletedを変更
 app.put("/api/edit/:id", async(c: any) => {
   const id = c.req.param("id");
 
@@ -104,6 +105,7 @@ app.put("/api/edit/:id", async(c: any) => {
   }
 });
 
+//タスクを削除
 app.delete("/api/delete/:id", async(c:any) => {
   const id = c.req.param("id");
   

@@ -1,6 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, json, useLoaderData } from "@remix-run/react";
 import "../styles/username.css";
+import { useState } from "react";
 
 export function links() {
   return [
@@ -58,15 +59,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const taskId = formData.get("id");
     const response = await fetch(`http://localhost:8787/api/delete/${taskId}`,{ method: "DELETE" });
   }
-
-
   return null;
 };
 
 function Todos() {
   const tasks = useLoaderData<typeof loader>();
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
+  const [editId, setEditId] = useState(null);
   console.log(tasks.data);
+
+  const handleEdit = (e, task) => {
+    console.log("handleEdit running!!");
+    e.preventDefault();
+    if (editId === task.id) {
+      setEditId(null);
+    } else {
+      setEditId(task.id);
+    }
+    return;
+  }
+
   return (
     <div className="todos-container">
       <Form method="POST" className="add-task-form">
@@ -87,19 +99,19 @@ function Todos() {
       </Form>
       <ul className="task-list">
         {tasks.data.id !== 0 &&
-          tasks.data.map((e: any) => (
-            <li key={e.id} className="task-item">
+          tasks.data.map((task: any) => (
+            <li key={task.id} className="task-item">
               <Form method="POST">
                 <input type="hidden" name="_method" value="PUT" />
-                <input type="hidden" name="id" value={e.id} />
-                <input type="checkbox" name="checkbox" value={e.completed} />
+                <input type="hidden" name="id" value={task.id} />
+                <input type="checkbox" name="checkbox" value={task.completed} />
                 {/* valueの中身を一時的に消している */}
-                <input type="textarea" name="task" className="task-text" value={e.task} readOnly />
-                <button type="submit" className="edit-button">編集</button>
+                <input type="textarea" name="task" className="task-text" value={task.task} readOnly={editId !== task.id} onChange={() => ()} />
+                <button className="edit-button" onClick={(e) => handleEdit(e, task)} >{editId === task.id ? "保存" : "編集"}</button>
               </Form>
               <Form method="POST">
                 <input type="hidden" name="_method" value="DELETE" />
-                <input type="hidden" name="id" value={e.id} />
+                <input type="hidden" name="id" value={task.id} />
                 <button type="submit" className="delete-button">削除</button>
               </Form>
             </li>
