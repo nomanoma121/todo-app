@@ -62,7 +62,7 @@ app.get("/api/tasks", async (c: any) => {
     const result = await c.env.DB.prepare("SELECT * FROM tasks WHERE userid = ?").bind(userid).all();
     //タスクが一つもない場合はuseridを渡す
     if ( result.results.length == 0 ) {
-      return c.json({ "id": 0, "userid": userid });
+      return c.json([{ "id": 0, "userid": userid }]);
     }
 
     return c.json(result.results);
