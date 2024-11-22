@@ -1,7 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, json, useLoaderData } from "@remix-run/react";
 import "../styles/username.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function links() {
   return [
@@ -42,19 +42,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   } else if (method === "PUT") {
     const taskId = formData.get("id");
-    const task = formData.get("task");
-    const completed = formData.get("checkbox");
+    const checkbox = formData.get("checkbox");
+    const completed = (checkbox === "on") ? 1 : 0;
     const response = await fetch(`http://localhost:8787/api/edit/${taskId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ task: task, completed: completed}),
+      body: JSON.stringify({ completed: completed })
     });
-    
-    if (response.ok) {
-      console.log("タスクの編集に成功しました。");
-    }
   } else if (method === "DELETE") {
     const taskId = formData.get("id");
     const response = await fetch(`http://localhost:8787/api/delete/${taskId}`,{ method: "DELETE" });
@@ -64,26 +60,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 function Todos() {
   const tasks = useLoaderData<typeof loader>();
+  const [taskInput, setTaskInput] = useState("");
+  const [copyTask, setCopyTask] = useState("");
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
-  const [editId, setEditId] = useState(null);
-  console.log(tasks.data);
-
-  const handleEdit = (e, task) => {
-    console.log("handleEdit running!!");
-    e.preventDefault();
-    if (editId === task.id) {
-      setEditId(null);
-    } else {
-      setEditId(task.id);
-    }
-    return;
-  }
+  
+  useEffect(() => {
+    setCopyTask(taskInput);
+  }, [taskInput]);
 
   return (
     <div className="todos-container">
       <Form method="POST" className="add-task-form">
         <input type="hidden" name="_method" value="POST" />
         <input type="hidden" name="userid" value={userid} />
+        <input type="hidden" name="task" value={copyTask} />
         <label className="task-label">
           タスクを追加:
           <input
@@ -91,23 +81,29 @@ function Todos() {
             name="task"
             className="task-input"
             placeholder="新しいタスクを入力"
+            value={taskInput}
+            onChange={(e) => setTaskInput(e.target.value)}
           />
         </label>
-        <button type="submit" className="add-button">
+        <button type="submit" className="add-button" onClick={() => setTaskInput("")}>
           追加
         </button>
       </Form>
       <ul className="task-list">
         {tasks.data.id !== 0 &&
-          tasks.data.map((task: any) => (
+          tasks.data.map((task) => (
             <li key={task.id} className="task-item">
               <Form method="POST">
                 <input type="hidden" name="_method" value="PUT" />
                 <input type="hidden" name="id" value={task.id} />
-                <input type="checkbox" name="checkbox" value={task.completed} />
-                {/* valueの中身を一時的に消している */}
-                <input type="textarea" name="task" className="task-text" value={task.task} readOnly={editId !== task.id} onChange={() => ()} />
-                <button className="edit-button" onClick={(e) => handleEdit(e, task)} >{editId === task.id ? "保存" : "編集"}</button>
+                <input
+                  type="checkbox"
+                  name="checkbox"
+                  checked={task.completed}
+                  onClick={(e) => e.target.form.submit()}
+                  readOnly
+                />
+                  <span className="task-text">{task.task}</span>
               </Form>
               <Form method="POST">
                 <input type="hidden" name="_method" value="DELETE" />

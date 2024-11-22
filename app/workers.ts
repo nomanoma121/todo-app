@@ -86,17 +86,19 @@ app.post("/api/add", async (c: any) => {
  }
 });
 
-//タスク内容とcompletedを変更
+//completedを変更
 app.put("/api/edit/:id", async(c: any) => {
   const id = c.req.param("id");
 
   const param = await c.req.json();
+  //completedの値を反転させる
+  const completed = param.completed ? 1 : 0;
   console.log(param);
   
   try {
     await c.env.DB.prepare(
-      "UPDATE tasks SET task = ?, completed = ? WHERE id = ?" 
-    ).bind(param.task, param.completed, id).run();
+      "UPDATE tasks SET completed = ? WHERE id = ?" 
+    ).bind(completed, id).run();
 
     return c.json({ message: "Successfully edited" });
   } catch (err) {
