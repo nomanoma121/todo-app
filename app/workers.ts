@@ -32,9 +32,12 @@ app.post("/api/post", async (c: any) => {
 app.post("/api/register", async (c: any) => {
   const username = await c.req.json();
   console.log(username);
-
-  c.env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind(username).run();
-  return c.text("User registered successfully");
+  try {
+    c.env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind(username).run();
+    return c.json({ message: "Successfully created."}, 200); 
+  } catch {
+    return c.json({ message: "An error occurred."}, 400);
+  }
 });
 
 //ユーザー検索

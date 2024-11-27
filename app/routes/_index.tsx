@@ -2,7 +2,9 @@ import React from 'react'
 
 function Index() {
   return (
-    <div>Hello</div>
+    <div>
+      <p>Todoリストへようこそ！まずはユーザー登録をしよう！</p>
+    </div>
   )
 }
 
