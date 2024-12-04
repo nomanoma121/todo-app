@@ -17,20 +17,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (registername.match(/[^a-zA-Z0-9]/)) {
       return json({ message: "使用できるのは英数字のみです" }, 400);
     }
+    console.log("registername", registername);
 
     const response = await fetch("http://localhost:8787/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(registername),
+      body: JSON.stringify({ registername: registername }),
     });
 
     if (response.ok) {
       console.log("ユーザー登録に成功しました。");
       return redirect(`/${registername}`);
-    } else if (response.status === 400) {
-      return json({ message: "ユーザー名が既に存在します。" }, 400);
+    } else {
+      const data = await response.json();
+      return json({ message: data.message }, response.status);
     }
   } else if (actionType == "search") {
     const response = await fetch(

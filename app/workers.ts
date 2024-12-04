@@ -32,16 +32,18 @@ app.post("/api/post", async (c: any) => {
 
 //ユーザー登録
 app.post("/api/register", async (c: any) => {
-  const { username } = await c.req.json();
-  // usernameが英字のみかチェック
-  if (!/^[a-zA-Z]+$/.test(username)) {
-    return c.json({ message: "Bad Request" }, 400);
-  }
+  const { registername } = await c.req.json();
   try {
-    await c.env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind(username).run();
-    return c.json({ message: "Successfully created."}, 200); 
-  } catch {
-    return c.json({ message: "An error occurred."}, 500);
+    await c.env.DB.prepare("INSERT INTO users (name) VALUES (?)")
+      .bind(registername)
+      .run();
+    return c.json({ message: "Successfully created." }, 200);
+  } catch (err) {
+    if (err.message.includes("UNIQUE constraint failed")) {
+      console.log("このユーザー名はすでに存在します");
+      return c.json({ message: "このユーザー名はすでに存在します" }, 400);
+    }
+    return c.json({ message: "An error occurred." }, 500);
   }
 });
 
@@ -49,7 +51,9 @@ app.post("/api/register", async (c: any) => {
 app.get("/api/search", async (c: any) => {
   const { name } = c.req.query;
   try {
-    const result = await c.env.DB.prepare("SELECT * FROM users WHERE name = ?").bind(name).first();
+    const result = await c.env.DB.prepare("SELECT * FROM users WHERE name = ?")
+      .bind(name)
+      .first();
     if (result) {
       return c.json(result, 200);
     } else {
@@ -66,19 +70,27 @@ app.get("/api/tasks", async (c: any) => {
 
   try {
     // ユーザーidを取得
-    const userResult = await c.env.DB.prepare("SELECT id FROM users WHERE name = ?").bind(username).first();
+    const userResult = await c.env.DB.prepare(
+      "SELECT id FROM users WHERE name = ?"
+    )
+      .bind(username)
+      .first();
     const userid = userResult.id;
     // ユーザーidをもとにタスクを取得
-    const result = await c.env.DB.prepare("SELECT * FROM tasks WHERE userid = ?").bind(userid).all();
+    const result = await c.env.DB.prepare(
+      "SELECT * FROM tasks WHERE userid = ?"
+    )
+      .bind(userid)
+      .all();
     //タスクが一つもない場合はuseridを渡す
-    if ( result.results.length == 0 ) {
-      return c.json({ "id": 0, "userid": userid });
+    if (result.results.length == 0) {
+      return c.json({ id: 0, userid: userid });
     }
 
     return c.json(result.results);
   } catch {
     console.log("Internal Server Error.");
-    return c.json({ message: "Internal Server Error."}, 500);
+    return c.json({ message: "Internal Server Error." }, 500);
   }
 });
 
@@ -88,27 +100,29 @@ app.post("/api/add", async (c: any) => {
   try {
     await c.env.DB.prepare(
       "INSERT INTO tasks (userid, task, completed) VALUES (?, ?, ?)"
-    ).bind(param.userid, param.task, param.completed).run();
+    )
+      .bind(param.userid, param.task, param.completed)
+      .run();
 
     return c.json({ message: "Successfully added" });
   } catch (error) {
-    return c.json({ message: "Internal Server Error."});
- }
+    return c.json({ message: "Internal Server Error." });
+  }
 });
 
 //completedを変更
-app.put("/api/edit/:id", async(c: any) => {
+app.put("/api/edit/:id", async (c: any) => {
   const id = c.req.param("id");
 
   const param = await c.req.json();
   //completedの値を反転させる
   const completed = param.completed ? 1 : 0;
   console.log(param);
-  
+
   try {
-    await c.env.DB.prepare(
-      "UPDATE tasks SET completed = ? WHERE id = ?" 
-    ).bind(completed, id).run();
+    await c.env.DB.prepare("UPDATE tasks SET completed = ? WHERE id = ?")
+      .bind(completed, id)
+      .run();
 
     return c.json({ message: "Successfully edited" });
   } catch (err) {
@@ -118,9 +132,9 @@ app.put("/api/edit/:id", async(c: any) => {
 });
 
 //タスクを削除
-app.delete("/api/delete/:id", async(c:any) => {
+app.delete("/api/delete/:id", async (c: any) => {
   const id = c.req.param("id");
-  
+
   try {
     await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(id).run();
     return c.json({ message: "Successfully deleted" });

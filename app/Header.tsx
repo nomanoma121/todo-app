@@ -2,7 +2,9 @@ import { Form, useActionData } from "@remix-run/react";
 
 function Header() {
   const actionData = useActionData();
+  console.log(actionData);
   const errorMessage = actionData?.message;
+  console.log(errorMessage);
   return (
     <div style={{ padding: "20px", backgroundColor: "#f8f9fa" }}>
       <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>Todoリスト</h1>
