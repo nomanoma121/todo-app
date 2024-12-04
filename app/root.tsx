@@ -1,5 +1,5 @@
 import { Links, Meta, Scripts, Outlet, redirect, json } from "@remix-run/react";
-import { ActionFunctionArgs } from "@remix-run/cloudflare";
+import { ActionFunctionArgs } from "@remix-run/node";
 import { apiUrl } from "../config";
 import Header from "./Header";
 
