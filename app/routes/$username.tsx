@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Form, json, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { apiUrl } from "../../config";
