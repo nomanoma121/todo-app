@@ -48,19 +48,19 @@ app.post("/api/register", async (c: any) => {
 });
 
 //ユーザー検索
-app.get("/api/search", async (c: any) => {
-  const { name } = c.req.query;
+app.post("/api/search", async (c: any) => {
+  const { searchname } = await c.req.json();
   try {
     const result = await c.env.DB.prepare("SELECT * FROM users WHERE name = ?")
-      .bind(name)
+      .bind(searchname)
       .first();
     if (result) {
       return c.json(result, 200);
     } else {
-      return c.json({ message: "ユーザーが見つかりません。" }, 404);
+      return c.json({ message: "ユーザーが見つかりません" }, 404);
     }
   } catch (err) {
-    return c.json({ message: "検索中にエラーが発生しました。" }, 500);
+    return c.json({ message: "検索中にエラーが発生しました" }, 500);
   }
 });
 

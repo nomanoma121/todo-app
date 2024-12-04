@@ -10,6 +10,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const searchname = formData.get("search");
 
   if (actionType == "register") {
+    // ユーザー登録
     if (registername === "") {
       return json({ message: "登録するユーザー名を入力してください" }, 400);
     }
@@ -34,14 +35,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const data = await response.json();
       return json({ message: data.message }, response.status);
     }
+    // ユーザー検索
   } else if (actionType == "search") {
     const response = await fetch(
-      `http://localhost:8787/api/search?name=${searchname}`
+      `http://localhost:8787/api/search`,{
+      method: "POST",
+      body: JSON.stringify({ searchname: searchname }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
     );
     const data = await response.json();
 
     if (response.ok) {
       return redirect(`/${data.name}`);
+    } else {
+      return json({ message: data.message }, response.status);
     }
   }
   return null;

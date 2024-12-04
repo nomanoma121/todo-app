@@ -2,15 +2,19 @@ import { Form, useActionData } from "@remix-run/react";
 
 function Header() {
   const actionData = useActionData();
-  console.log(actionData);
   const errorMessage = actionData?.message;
-  console.log(errorMessage);
   return (
     <div style={{ padding: "20px", backgroundColor: "#f8f9fa" }}>
-      <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>Todoリスト</h1>
+      <h1
+        style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
+      >
+        Todoリスト
+      </h1>
       <Form method="POST" style={{ display: "flex" }}>
         <input type="hidden" name="actionType" value="register" />
-        <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
+        <label
+          style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}
+        >
           ユーザ登録
           <input
             type="text"
@@ -39,15 +43,24 @@ function Header() {
             marginLeft: "10px",
           }}
         />
-        {errorMessage && (
-          <label style={{ color: "red", marginLeft: "10px", display: "block", marginTop: "10px" }}>
+        {errorMessage && errorMessage !== "ユーザーが見つかりません" && (
+          <label
+            style={{
+              color: "red",
+              marginLeft: "10px",
+              display: "block",
+              marginTop: "10px",
+            }}
+          >
             {errorMessage}
           </label>
         )}
       </Form>
       <Form method="POST" style={{ marginBottom: "20px", display: "flex" }}>
         <input type="hidden" name="actionType" value="search" />
-        <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
+        <label
+          style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}
+        >
           ユーザー検索
           <input
             type="text"
@@ -75,6 +88,18 @@ function Header() {
             marginLeft: "10px",
           }}
         />
+        {errorMessage === "ユーザーが見つかりません" && (
+          <label
+            style={{
+              color: "red",
+              marginLeft: "10px",
+              display: "block",
+              marginTop: "10px",
+            }}
+          >
+            {errorMessage}
+          </label>
+        )}
       </Form>
     </div>
   );
