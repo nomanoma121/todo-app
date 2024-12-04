@@ -1,12 +1,13 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, json, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { apiUrl } from "../../config";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const username = url.pathname.replace(/^\/+/, "");
   const response = await fetch(
-    `http://localhost:8787/api/tasks?name=${username}`
+    `${apiUrl}/api/tasks?name=${username}`
   );
   const data = await response.json();
   return json({ data });
@@ -22,7 +23,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (task === "") {
       return json({ message: "Bad Request" }, { status: 400 });
     }
-    const response = await fetch("http://localhost:8787/api/add", {
+    const response = await fetch(`${apiUrl}/api/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +36,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   } else if (method === "DELETE") {
     const taskId = formData.get("id");
-    const response = await fetch(`http://localhost:8787/api/delete/${taskId}`, {
+    const response = await fetch(`${apiUrl}/api/delete/${taskId}`, {
       method: "DELETE",
     });
     if (!response.ok) {

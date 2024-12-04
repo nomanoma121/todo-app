@@ -1,5 +1,6 @@
 import { Links, Meta, Scripts, Outlet, redirect, json } from "@remix-run/react";
 import { ActionFunctionArgs } from "@remix-run/node";
+import { apiUrl } from "../config";
 import Header from "./Header";
 
 //Header.tsxからPOST
@@ -20,7 +21,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
     console.log("registername", registername);
 
-    const response = await fetch("http://localhost:8787/api/register", {
+    const response = await fetch(`${apiUrl}/api/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +39,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     // ユーザー検索
   } else if (actionType == "search") {
     const response = await fetch(
-      `http://localhost:8787/api/search`,{
+      `${apiUrl}/api/search`,{
       method: "POST",
       body: JSON.stringify({ searchname: searchname }),
       headers: {
