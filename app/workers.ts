@@ -1,11 +1,9 @@
 import { Hono } from "hono";
-import { s } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 const app = new Hono();
 
 //TODO:エラーハンドリングを全くやっていないのでやる
-
-
+// タスクを取得
 app.get("/api/get", async (c: any) => {
   const table = await c.req.query("table");
   try {
@@ -16,6 +14,7 @@ app.get("/api/get", async (c: any) => {
   }
 });
 
+// タスクを追加
 app.post("/api/post", async (c: any) => {
   const param = await c.req.json();
   try {
@@ -24,33 +23,41 @@ app.post("/api/post", async (c: any) => {
       .run();
     return c.json({ message: "Successfully created." });
   } catch (err) {
-    return c.json({ error: "データ挿入エラー" });
+    if (err.message.includes("UNIQUE constraint failed")) {
+      return c.json({ error: "ユーザー名が既に存在します。" }, 400);
+    }
+    return c.json({ error: "データ挿入エラー" }, 500);
   }
 });
 
 //ユーザー登録
 app.post("/api/register", async (c: any) => {
-  const username = await c.req.json();
-  console.log(username);
+  const { username } = await c.req.json();
+  // usernameが英字のみかチェック
+  if (!/^[a-zA-Z]+$/.test(username)) {
+    return c.json({ message: "Bad Request" }, 400);
+  }
   try {
-    c.env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind(username).run();
+    await c.env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind(username).run();
     return c.json({ message: "Successfully created."}, 200); 
   } catch {
-    return c.json({ message: "An error occurred."}, 400);
+    return c.json({ message: "An error occurred."}, 500);
   }
 });
 
 //ユーザー検索
 app.get("/api/search", async (c: any) => {
-  const username: string = c.req.query("name");
-
-  const result = await c.env.DB.prepare(`SELECT * FROM users WHERE name = ?`)
-    .bind(username)
-    .all();
-  if (result.results.length > 0) {
-    return c.json(result.results[0]);
+  const { name } = c.req.query;
+  try {
+    const result = await c.env.DB.prepare("SELECT * FROM users WHERE name = ?").bind(name).first();
+    if (result) {
+      return c.json(result, 200);
+    } else {
+      return c.json({ message: "ユーザーが見つかりません。" }, 404);
+    }
+  } catch (err) {
+    return c.json({ message: "検索中にエラーが発生しました。" }, 500);
   }
-  return c.json({ message: "User not found"}, 404);
 });
 
 //usernameからuseridを取得し、taskを取得する

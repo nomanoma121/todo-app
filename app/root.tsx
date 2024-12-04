@@ -1,15 +1,23 @@
-import { Links, Meta, Scripts, Outlet, redirect } from "@remix-run/react";
+import { Links, Meta, Scripts, Outlet, redirect, json } from "@remix-run/react";
 import { ActionFunctionArgs } from "@remix-run/node";
 import Header from "./Header";
 
 //Header.tsxからPOST
-export const action = async ({ request }: ActionFunctionArgs ) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const actionType = formData.get("actionType");
   const registername = formData.get("register");
   const searchname = formData.get("search");
 
   if (actionType == "register") {
+    if (registername === "") {
+      return json({ message: "登録するユーザー名を入力してください" }, 400);
+    }
+
+    if (registername.match(/[^a-zA-Z0-9]/)) {
+      return json({ message: "使用できるのは英数字のみです" }, 400);
+    }
+
     const response = await fetch("http://localhost:8787/api/register", {
       method: "POST",
       headers: {
@@ -21,14 +29,16 @@ export const action = async ({ request }: ActionFunctionArgs ) => {
     if (response.ok) {
       console.log("ユーザー登録に成功しました。");
       return redirect(`/${registername}`);
+    } else if (response.status === 400) {
+      return json({ message: "ユーザー名が既に存在します。" }, 400);
     }
-  } else 
-
-  if (actionType == "search") {
-    const response = await fetch(`http://localhost:8787/api/search?name=${searchname}`);
+  } else if (actionType == "search") {
+    const response = await fetch(
+      `http://localhost:8787/api/search?name=${searchname}`
+    );
     const data = await response.json();
 
-    if(response.ok){
+    if (response.ok) {
       return redirect(`/${data.name}`);
     }
   }
@@ -43,7 +53,9 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body
+        style={{ margin: 0, backgroundColor: "#f8f9fa", padding: "0 100px" }}
+      >
         <Header />
         <main>
           <Outlet />
