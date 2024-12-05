@@ -34,7 +34,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (response.ok) {
       console.log("タスク追加に成功しました");
     }
-  } else if (method === "DELETE") {
+  } else if (method === "PUT") {
+    const taskId = formData.get("id");
+    const checkbox = formData.get("checkbox");
+    const completed = (checkbox === "on") ? 1 : 0;
+    const response = await fetch(`${apiUrl}/api/edit/${taskId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: completed })
+    });
+    
+    if (response.ok) {
+      console.log("タスクの編集に成功しました。");
+    }
+  }else if (method === "DELETE") {
     const taskId = formData.get("id");
     const response = await fetch(`${apiUrl}/api/delete/${taskId}`, {
       method: "DELETE",
@@ -75,7 +90,7 @@ function Todos() {
           {username}さんのTodoリスト
         </h2>
       </div>
-      {/* <Form method="POST" style={{ marginBottom: "20px", display: "flex", width: "100%" }}>
+      <Form method="POST" style={{ marginBottom: "20px", display: "flex", width: "100%" }}>
         <input type="hidden" name="_method" value="POST" />
         <input type="hidden" name="userid" value={userid} />
         <input type="hidden" name="task" value={copyTask} />
@@ -176,7 +191,7 @@ function Todos() {
               </Form>
             </li>
           ))}
-      </ul> */}
+      </ul>
     </div>
   );
 }
