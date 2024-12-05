@@ -1,14 +1,12 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, json, useActionData, useLoaderData, useLocation } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { apiUrl } from "../../config";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const username = url.pathname.replace(/^\/+/, "");
-  const response = await fetch(
-    `${apiUrl}/api/tasks?name=${username}`
-  );
+  const response = await fetch(`${apiUrl}/api/tasks?name=${username}`);
   const data = await response.json();
   return json({ data });
 };
@@ -37,19 +35,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   } else if (method === "PUT") {
     const taskId = formData.get("id");
     const checkbox = formData.get("checkbox");
-    const completed = (checkbox === "on") ? 1 : 0;
+    const completed = checkbox === "on" ? 1 : 0;
     const response = await fetch(`${apiUrl}/api/edit/${taskId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ completed: completed })
+      body: JSON.stringify({ completed: completed }),
     });
-    
+
     if (response.ok) {
       console.log("タスクの編集に成功しました。");
     }
-  }else if (method === "DELETE") {
+  } else if (method === "DELETE") {
     const taskId = formData.get("id");
     const response = await fetch(`${apiUrl}/api/delete/${taskId}`, {
       method: "DELETE",
@@ -66,16 +64,13 @@ function Todos() {
   const actionData = useActionData();
 
   if (tasks.data.message === "Internal Server Error.") {
-    return <h1>404 Not Found</h1>
-  } 
+    return <h1>404 Not Found</h1>;
+  }
   const [taskInput, setTaskInput] = useState("");
   const [copyTask, setCopyTask] = useState("");
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
-  let username = "";
-  if (typeof window !== "undefined") {
-    const url = new URL(window.location.href);
-    username = url.pathname.replace(/^\/+/, "");
-  }
+
+  const username = useLocation().pathname.replace(/^\/+/, "");
 
   useEffect(() => {
     setCopyTask(taskInput);
@@ -87,10 +82,13 @@ function Todos() {
         <h2
           style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
         >
-          {username}さんのTodoリスト
+          {username}さんのTODOリスト
         </h2>
       </div>
-      <Form method="POST" style={{ marginBottom: "20px", display: "flex", width: "100%" }}>
+      <Form
+        method="POST"
+        style={{ marginBottom: "20px", display: "flex", width: "100%" }}
+      >
         <input type="hidden" name="_method" value="POST" />
         <input type="hidden" name="userid" value={userid} />
         <input type="hidden" name="task" value={copyTask} />
@@ -131,7 +129,14 @@ function Todos() {
           追加
         </button>
         {actionData?.message === "Bad Request" && (
-          <label style={{ color: "red", marginLeft: "10px", display: "block", marginTop: "10px" }}>
+          <label
+            style={{
+              color: "red",
+              marginLeft: "10px",
+              display: "block",
+              marginTop: "10px",
+            }}
+          >
             タスクを入力してください
           </label>
         )}
@@ -163,7 +168,7 @@ function Todos() {
                   type="checkbox"
                   name="checkbox"
                   checked={task.completed}
-                  onClick={(e) => e.target.form.submit()}
+                  onClick={(e) => e.target.form?.submit()}
                   readOnly
                 />
                 <span
