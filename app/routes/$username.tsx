@@ -49,6 +49,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 function Todos() {
   const tasks = useLoaderData<typeof loader>();
   const actionData = useActionData();
+
+  if (tasks.data.message === "Internal Server Error.") {
+    return <h1>404 Not Found</h1>
+  } 
   const [taskInput, setTaskInput] = useState("");
   const [copyTask, setCopyTask] = useState("");
   const userid = tasks.data.id !== 0 ? tasks.data[0].userid : tasks.data.userid;
@@ -62,9 +66,6 @@ function Todos() {
     setCopyTask(taskInput);
   }, [taskInput]);
 
-  console.log(actionData);
-  console.log(actionData?.message === "Bad Request");
-
   return (
     <div style={{ padding: "20px" }}>
       <div>
@@ -74,7 +75,7 @@ function Todos() {
           {username}さんのTodoリスト
         </h2>
       </div>
-      <Form method="POST" style={{ marginBottom: "20px", display: "flex", width: "100%" }}>
+      {/* <Form method="POST" style={{ marginBottom: "20px", display: "flex", width: "100%" }}>
         <input type="hidden" name="_method" value="POST" />
         <input type="hidden" name="userid" value={userid} />
         <input type="hidden" name="task" value={copyTask} />
@@ -175,7 +176,7 @@ function Todos() {
               </Form>
             </li>
           ))}
-      </ul>
+      </ul> */}
     </div>
   );
 }
