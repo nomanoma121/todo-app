@@ -2,7 +2,10 @@ import { Hono } from "hono";
 
 const app = new Hono();
 
-//TODO:エラーハンドリングを全くやっていないのでやる
+app.get("/", async (c: any) => {
+  return c.send("Hello, World!");
+});
+
 // タスクを取得
 app.get("/api/get", async (c: any) => {
   const table = await c.req.query("table");
